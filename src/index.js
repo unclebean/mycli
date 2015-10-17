@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var program = require('commander');
 var WatchCP = require("./watch-cp/");
+var HTTPServer = require("./http-server");
 
 program
   .version('0.0.1')
@@ -13,9 +14,9 @@ program
 program
   .version('0.0.1')
   .description('simple http server')
-  .command('SimpleHTTPServer')
-  .action(function(){
-  	console.log("simple http server");
+  .command('SimpleHTTPServer <path> <port>')
+  .action(function(path, port){
+    HTTPServer.start(path, Number.parseInt(port));
   });
 
 program.parse(process.argv);
