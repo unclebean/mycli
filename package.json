@@ -7,7 +7,7 @@
     "mycli": "./src/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "nodejs",
@@ -17,6 +17,8 @@
   "author": "hugh",
   "license": "MIT",
   "dependencies": {
+    "chai": "^3.3.0",
+    "chai-spies": "^0.7.1",
     "chokidar": "^1.0.6",
     "colors": "^1.1.2",
     "commander": "^2.8.1",
