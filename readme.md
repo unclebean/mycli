@@ -6,3 +6,8 @@
 	to create a simple file and directory monitor & synchronize tool.
 
 	mycli watch-cp <source> [destinations]
+	
+## SimpleHTTPServer(like python one)
+[serve-static](https://github.com/expressjs/serve-static), [express](https://github.com/strongloop/express) to provide static resouce http server.
+
+	mycli SimpleHTTPServer <path> <port>

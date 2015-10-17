@@ -1,6 +1,6 @@
 {
   "name": "mycli",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "commandline tools",
   "main": "index.js",
   "bin": {
