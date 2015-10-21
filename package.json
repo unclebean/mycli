@@ -17,7 +17,7 @@
   "author": "hugh",
   "license": "MIT",
   "dependencies": {
-    "chokidar": "^1.0.6",
+    "chokidar": "^1.0.7",
     "colors": "^1.1.2",
     "commander": "^2.8.1",
     "express": "^4.13.3",
