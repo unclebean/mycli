@@ -1,6 +1,6 @@
 {
   "name": "mycli",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "commandline tools",
   "main": "index.js",
   "bin": {
@@ -17,7 +17,7 @@
   "author": "hugh",
   "license": "MIT",
   "dependencies": {
-    "chokidar": "^1.0.7",
+    "chokidar": "^1.0.6",
     "colors": "^1.1.2",
     "commander": "^2.8.1",
     "express": "^4.13.3",
