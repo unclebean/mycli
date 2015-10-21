@@ -7,7 +7,7 @@
     "mycli": "./src/index.js"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --require blanket -R html-cov > coverage.html"
   },
   "keywords": [
     "nodejs",
@@ -17,18 +17,36 @@
   "author": "hugh",
   "license": "MIT",
   "dependencies": {
-    "chai": "^3.3.0",
-    "chai-spies": "^0.7.1",
     "chokidar": "^1.0.6",
     "colors": "^1.1.2",
     "commander": "^2.8.1",
     "express": "^4.13.3",
     "fs-extra": "^0.24.0",
-    "mocha": "^2.3.3",
+    "http-proxy": "^1.11.2",
+    "js-yaml": "^3.4.3",
     "serve-static": "^1.10.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/unclebean/mycli.git"
+  },
+  "devDependencies": {
+    "blanket": "^1.1.7",
+    "mocha": "^2.3.3",
+    "sinon": "^1.17.1",
+    "sinon-chai": "^2.8.0",
+    "chai": "^3.3.0",
+    "mocha-lcov-reporter": "^1.0.0"
+  },
+  "config": {
+    "blanket": {
+      "pattern": [
+        ""
+      ],
+      "data-cover-never": [
+        "node_modules",
+        "test"
+      ]
+    }
   }
 }

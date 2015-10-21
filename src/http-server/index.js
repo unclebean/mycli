@@ -8,8 +8,8 @@ module.exports = {
     path = !path || path.length===0 ? __dirname : path;
     port = Number.isInteger(port) ? port : 5555;
 
-    var app = express()
-    app.use(serveStatic(path, {'index': ['default.html', 'default.htm']}))
-    app.listen(port)
+    var app = express();
+    app.use(serveStatic(path, {'index': ['default.html', 'default.htm']}));
+    app.listen(port);
   }
 };

@@ -11,3 +11,17 @@
 [serve-static](https://github.com/expressjs/serve-static), [express](https://github.com/strongloop/express) to provide static resouce http server.
 
 	mycli SimpleHTTPServer <path> <port>
+
+## HTTP Proxy(for now doesn't support https)
+[js-yaml](https://github.com/nodeca/js-yaml) using yaml to provide proxy configuration.
+
+	mycli http-proxy <configuration file path>
+------------------------------------------------------
+	please follow below structure to provide your yaml file:
+	
+  		server:
+    		port: "2222"
+    		type: "http"
+  		target:
+    		host: "www.daemonology.net"
+    		port: 80

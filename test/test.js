@@ -1,19 +1,21 @@
 var chai = require('chai'),
-    spies = require('chai-spies');
+    sinon = require('sinon'),
+    sinonChai = require("sinon-chai");
 
-chai.use(spies);
-var should = chai.should(),
-    expect = chai.expect;
-    
+
+chai.use(sinonChai);
+var expect = chai.expect,
+    should = chai.should();
+
 var chokidar = require('chokidar');
 var WatchCP = require("../src/watch-cp/");
 
 describe('WatchCP', function() {
   describe('monitor()', function () {
     it('chokidar.watch should be called', function () {
-      chai.spy.on(chokidar, 'watch');
+      var spy = sinon.spy(chokidar, 'watch');
       WatchCP.monitor('testSRC', ['testDEST']);
-      expect(chokidar.watch).to.have.been.called();
+      spy.should.have.been.called;
     });
   });
 });
