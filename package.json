@@ -17,13 +17,13 @@
   "author": "hugh",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^1.1.1",
     "chokidar": "^1.0.6",
-    "colors": "^1.1.2",
     "commander": "^2.8.1",
     "express": "^4.13.3",
     "fs-extra": "^0.24.0",
-    "http-proxy": "^1.11.2",
     "js-yaml": "^3.4.3",
+    "minimist": "^1.2.0",
     "serve-static": "^1.10.0"
   },
   "repository": {

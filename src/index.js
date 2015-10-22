@@ -19,7 +19,7 @@ program
   .description('simple http server')
   .command('SimpleHTTPServer <path> <port>')
   .action(function(path, port){
-    HTTPServer.start(path, Number.parseInt(port));
+    HTTPServer.startHTTPS(path, Number.parseInt(port));
   });
 
 program
