@@ -3,3 +3,5 @@ node_js:
   - "4.2.1"
 sudo: false
 script: "npm test"
+after_success:
+  - "npm run coveralls"
