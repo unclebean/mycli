@@ -15,9 +15,17 @@ program
    });
 
 program
+     .version('0.0.1')
+     .description('simple http server')
+     .command('SimpleHTTPServer <path> <port>')
+     .action(function(path, port){
+       HTTPServer.startHTTP(path, Number.parseInt(port));
+     });
+
+program
   .version('0.0.1')
   .description('simple http server')
-  .command('SimpleHTTPServer <path> <port>')
+  .command('SimpleHTTPSServer <path> <port>')
   .action(function(path, port){
     HTTPServer.startHTTPS(path, Number.parseInt(port));
   });

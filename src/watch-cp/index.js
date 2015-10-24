@@ -1,17 +1,16 @@
 var fs = require('fs-extra');
-var chokidar = require('chokidar');
+var colors = require('colors/safe');
 
 module.exports = {
 	monitor : function(source, destinations){
-		console.log('monitor is running...');
-		chokidar.watch(source).on('all', function(event, path) {
-			console.log(event, path);
+		console.log(colors.green('monitor is running...'));
+		fs.watch(source, function(event, fileName){
+			//console.log(colors.red.underline(event), colors.red.underline(fileName));
 			fs.copy(source, destinations[0], {clobber:true}, function (err) {
 				if (err) {
 					return false;
-					//return console.error(err);
 				}
-				console.log("success!");
+				console.log(colors.green("success!"));
 			});
 		});
 	}

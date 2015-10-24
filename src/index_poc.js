@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-var chalk = require('chalk');
+var colors = require('colors/safe');
 var argv = require('minimist')(process.argv.slice(2));
-console.log(chalk.yellow(JSON.stringify(argv)));
+console.log(colors.green(JSON.stringify(argv)));
 
 /*
 console.log(chalk.red(process.argv));

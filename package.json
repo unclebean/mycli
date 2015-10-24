@@ -7,7 +7,7 @@
     "mycli": "./src/index.js"
   },
   "scripts": {
-    "test": "mocha --require blanket -R html-cov > coverage.html"
+    "test": "mocha test"
   },
   "keywords": [
     "nodejs",
@@ -17,8 +17,7 @@
   "author": "hugh",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^1.1.1",
-    "chokidar": "^1.0.6",
+    "colors": "^1.1.2",
     "commander": "^2.8.1",
     "express": "^4.13.3",
     "fs-extra": "^0.24.0",
