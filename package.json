@@ -1,10 +1,10 @@
 {
   "name": "mycli",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "commandline tools",
   "main": "./src/index.js",
   "bin": {
-    "mycli": "./src/index_poc.js"
+    "mycli": "./src/index.js"
   },
   "scripts": {
     "test": "mocha test"
@@ -18,7 +18,6 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
-    "commander": "^2.8.1",
     "express": "^4.13.3",
     "fs-extra": "^0.24.0",
     "js-yaml": "^3.4.3",
