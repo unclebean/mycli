@@ -7,7 +7,9 @@
     "mycli": "./src/index.js"
   },
   "scripts": {
-    "test": "mocha test"
+    "test": "mocha test",
+    "cover": "istanbul cover _mocha",
+    "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [
     "nodejs",
@@ -30,11 +32,13 @@
   },
   "devDependencies": {
     "blanket": "^1.1.7",
-    "mocha": "^2.3.3",
-    "sinon": "^1.17.1",
-    "sinon-chai": "^2.8.0",
     "chai": "^3.3.0",
-    "mocha-lcov-reporter": "^1.0.0"
+    "coveralls": "^2.11.4",
+    "istanbul": "^0.4.0",
+    "mocha": "^2.3.3",
+    "mocha-lcov-reporter": "^1.0.0",
+    "sinon": "^1.17.1",
+    "sinon-chai": "^2.8.0"
   },
   "config": {
     "blanket": {
