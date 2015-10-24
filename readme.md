@@ -1,5 +1,6 @@
 # Nodejs CLI TOOLS
 [![Build Status](https://travis-ci.org/unclebean/mycli.svg?branch=master)](https://travis-ci.org/unclebean/mycli)
+[![Coverage Status](https://coveralls.io/repos/unclebean/mycli/badge.svg?branch=master&service=github)](https://coveralls.io/github/unclebean/mycli?branch=master)
 ## watch & copy command:
 
 [commander](https://github.com/tj/commander), [fs-extra](https://github.com/jprichardson/node-fs-extra), [chokidar](https://github.com/paulmillr/chokidar)
