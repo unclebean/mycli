@@ -2,9 +2,9 @@
   "name": "mycli",
   "version": "1.0.7",
   "description": "commandline tools",
-  "main": "index.js",
+  "main": "./src/index.js",
   "bin": {
-    "mycli": "./src/index.js"
+    "mycli": "./src/index_poc.js"
   },
   "scripts": {
     "test": "mocha test"

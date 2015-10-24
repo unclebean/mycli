@@ -1,6 +1,7 @@
 var http = require('http'),
     url = require('url'),
     querystring = require('querystring');
+var colors = require('../utils/');
 
 module.exports = {
   startup:function(proxyOptions){
@@ -29,7 +30,7 @@ module.exports = {
             }
       });
 
-      console.log("proxy server is running on %d...", _port);
+      console.log(colors.info("proxy server is running on %d..."), _port);
       _server.listen(_port);
   },
   performRequest : function(options, endpoint, method, data, success) {
