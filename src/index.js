@@ -10,7 +10,7 @@ var colors = require('./utils/');
 
 
 var _commander = ['watch-cp', 'http-server', 'http-proxy'];
-var argv = parseArgs(process.argv.slice(2), opts={string:_commander, boolean:['https'], default:{port:5555, https:false}, alias:{help:'h'}});
+var argv = parseArgs(process.argv.slice(2), opts={string:_commander, boolean:['https'], default:{port:5555, https:false}, alias:{help:'h', version:'v'}});
 
 if(argv.help){
   console.log(colors.help("Welcome to use mycli %s."), pkg.version);
@@ -28,37 +28,45 @@ if(argv.help){
   process.exit(0);
 }
 
+if(argv.version){
+  console.log(colors.help(pkg.version));
+  process.exit(0);
+}
+
 process.on('SIGINT', function () {
   console.log(colors.warn('Got a sigint bye...'));
   process.exit(0);
 });
-
-if(argv._.indexOf(_commander[0]) > -1){
-  //watch-cp
-  try{
-    var _src = argv._[1],
-        _dest = argv._[2];
-    WatchCP.monitor(_src, _dest);
-  }catch(e){
-    console.log(colors.error("please provide resource path & destination path."));
-  }
-}else if(argv._.indexOf(_commander[1]) > -1){
-  //http-server
-  var _port = argv.port;
-  if(argv._.length === 3){
-    _port = argv._[2];
-  }
-  if(argv.https){
-    HTTPServer.startHTTPS(argv._[1], Number.parseInt(_port));
-  }else{
-    HTTPServer.startHTTP(argv._[1], Number.parseInt(_port));
-  }
-}else if(argv._.indexOf(_commander[2]) > -1){
-  //http-proxy
-  try{
-    var _options = yaml.safeLoad(fs.readFileSync(argv._[1], 'utf8'));
-    HTTPProxy.startup(_options);
-  }catch(e){
-    console.log(colors.error("Please follow readme to provide correct .yml file."));
+function main(argv){
+  if(argv._.indexOf(_commander[0]) > -1){
+    //watch-cp
+    try{
+      var _src = argv._[1],
+          _dest = argv._[2];
+      WatchCP.monitor(_src, _dest);
+    }catch(e){
+      console.log(colors.error("please provide resource path & destination path."));
+    }
+  }else if(argv._.indexOf(_commander[1]) > -1){
+    //http-server
+    var _port = argv.port;
+    if(argv._.length === 3){
+      _port = argv._[2];
+    }
+    if(argv.https){
+      HTTPServer.startHTTPS(argv._[1], Number.parseInt(_port));
+    }else{
+      HTTPServer.startHTTP(argv._[1], Number.parseInt(_port));
+    }
+  }else if(argv._.indexOf(_commander[2]) > -1){
+    //http-proxy
+    try{
+      var _options = yaml.safeLoad(fs.readFileSync(argv._[1], 'utf8'));
+      HTTPProxy.startup(_options);
+    }catch(e){
+      console.log(colors.error("Please follow readme to provide correct .yml file."));
+    }
   }
 }
+
+main(argv);
