@@ -45,7 +45,7 @@ function main(argv){
           _dest = argv._[2];
       WatchCP.monitor(_src, _dest);
     }catch(e){
-      console.log(colors.error("please provide resource path & destination path."));
+      console.log(colors.error("please provide source path & destination path."));
     }
   }else if(argv._.indexOf(_commander[1]) > -1){
     //http-server
@@ -70,3 +70,5 @@ function main(argv){
 }
 
 main(argv);
+
+module.exports = main;

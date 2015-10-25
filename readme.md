@@ -1,6 +1,8 @@
 # Nodejs CLI TOOLS
 [![Build Status](https://travis-ci.org/unclebean/mycli.svg?branch=master)](https://travis-ci.org/unclebean/mycli)
 [![Coverage Status](https://coveralls.io/repos/unclebean/mycli/badge.svg?branch=master&service=github)](https://coveralls.io/github/unclebean/mycli?branch=master)
+[![NPM Version][npm-image]][npm-url]
+  [![NPM Downloads][downloads-image]][downloads-url]
 ## watch & copy command:
 
 [commander](https://github.com/tj/commander), [fs-extra](https://github.com/jprichardson/node-fs-extra), [chokidar](https://github.com/paulmillr/chokidar)
@@ -26,3 +28,9 @@
   		target:
     		host: "www.daemonology.net"
     		port: 80
+
+
+[npm-image]: https://img.shields.io/npm/v/mycli.svg
+[npm-url]: https://npmjs.org/package/mycli
+[downloads-image]: https://img.shields.io/npm/dm/mycli.svg
+[downloads-url]: https://npmjs.org/package/mycli
