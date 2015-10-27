@@ -31,7 +31,7 @@ module.exports = {
               });
               req.on('end', function(){
                 _data = querystring.parse(_temp.join(''));
-                self.performRequest(_proxyType, _options, _url, req.method, req.headers _data, function(responseStr, headers){
+                self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
                   self._insertOrUpdate(_url, responseStr, headers);
                   res.headers = headers;
                   res.write(responseStr);
