@@ -12,7 +12,7 @@ var colors = require('../utils/');
 module.exports = {
   startHTTP:function(path, port){
     path = !path || path.length===0 ? __dirname : path;
-    port = Number.isInteger(port) ? port : 5555;
+    port = isNaN(port) ? 5555 : port;
 
     var app = express();
     app.use(serveStatic(path, {'index': ['default.html', 'index.html']}));
@@ -22,7 +22,7 @@ module.exports = {
   },
   startHTTPS:function(path, port){
     path = !path || path.length===0 ? __dirname : path;
-    port = Number.isInteger(port) ? port : 5555;
+    port = isNaN(port) ? 5555 : port;
 
     var app = express();
     app.use(serveStatic(path, {'index': ['default.html', 'index.html']}));

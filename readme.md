@@ -5,7 +5,7 @@
   [![NPM Downloads][downloads-image]][downloads-url]
 ## watch & copy command:
 
-[commander](https://github.com/tj/commander), [fs-extra](https://github.com/jprichardson/node-fs-extra), [chokidar](https://github.com/paulmillr/chokidar)
+[fs-extra](https://github.com/jprichardson/node-fs-extra), [async](https://github.com/caolan/async)
 	to create a simple file and directory monitor & synchronize tool.
 
 	mycli watch-cp <source> <destination>
@@ -16,7 +16,7 @@
 	mycli http-server <path> <port> [--https=true]
 
 ## HTTP Proxy(for now doesn't support https)
-[js-yaml](https://github.com/nodeca/js-yaml) using yaml to provide proxy configuration.
+[js-yaml](https://github.com/nodeca/js-yaml), [nedb](https://github.com/louischatriot/nedb) using yaml to provide proxy configuration and using nedb to record all response data.
 
 	mycli http-proxy <configuration file path>
 ------------------------------------------------------
@@ -25,9 +25,12 @@
   		server:
     		port: "2222"
     		type: "http"
+    		proxyType: "HTTPS"
+    		replay: true
   		target:
     		host: "www.daemonology.net"
     		port: 80
+    		
 
 
 [npm-image]: https://img.shields.io/npm/v/mycli.svg

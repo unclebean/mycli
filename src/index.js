@@ -54,9 +54,9 @@ function main(argv){
       _port = argv._[2];
     }
     if(argv.https){
-      HTTPServer.startHTTPS(argv._[1], Number.parseInt(_port));
+      HTTPServer.startHTTPS(argv._[1], parseInt(_port));
     }else{
-      HTTPServer.startHTTP(argv._[1], Number.parseInt(_port));
+      HTTPServer.startHTTP(argv._[1], parseInt(_port));
     }
   }else if(argv._.indexOf(_commander[2]) > -1){
     //http-proxy
