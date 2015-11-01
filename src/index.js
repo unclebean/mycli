@@ -10,7 +10,7 @@ var colors = require('./utils/');
 
 
 var _commander = ['watch-cp', 'http-server', 'http-proxy'];
-var argv = parseArgs(process.argv.slice(2), opts={string:_commander, boolean:['https'], default:{port:5555, https:false}, alias:{help:'h', version:'v'}});
+var argv = parseArgs(process.argv.slice(2), opts={string:_commander, boolean:['https'], default:{port:5555, https:false}, alias:{help:'h', version:'v', extions:'e'}});
 
 if(argv.help){
   console.log(colors.help("Welcome to use mycli %s."), pkg.version);
@@ -49,14 +49,15 @@ function main(argv){
     }
   }else if(argv._.indexOf(_commander[1]) > -1){
     //http-server
-    var _port = argv.port;
+    var _port = argv.port,
+        _extions = argv.extions;
     if(argv._.length === 3){
       _port = argv._[2];
     }
     if(argv.https){
-      HTTPServer.startHTTPS(argv._[1], parseInt(_port));
+      HTTPServer.startHTTPS(argv._[1], parseInt(_port), _extions);
     }else{
-      HTTPServer.startHTTP(argv._[1], parseInt(_port));
+      HTTPServer.startHTTP(argv._[1], parseInt(_port), _extions);
     }
   }else if(argv._.indexOf(_commander[2]) > -1){
     //http-proxy

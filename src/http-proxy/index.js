@@ -1,6 +1,8 @@
 var https = require('https'),
     http = require('http'),
     url = require('url'),
+    fs = require('fs'),
+    zlib = require('zlib'),
     querystring = require('querystring');
 var Datastore = require('nedb'),
     db = new Datastore({ filename: './proxyDB' });
@@ -10,43 +12,52 @@ var colors = require('../utils/');
 module.exports = {
   startup:function(proxyOptions){
       var self = this,
-          _port = parseInt(proxyOptions.server.port) ? proxyOptions.server.port : 5555;
-          _options = proxyOptions.target,
-          _proxyType = proxyOptions.server.proxyType,
-          _server = http.createServer(function(req, res){
+          _port = parseInt(proxyOptions.server.port) ? proxyOptions.server.port : 5555,
+          _options = proxyOptions.target;
+      var _proxyType = proxyOptions.server.proxyType ? proxyOptions.server.proxyType : "HTTP";
+      try{
+          _options.key = fs.readFileSync(_options.key, 'utf8');
+          _options.cert = fs.readFileSync(_options.cert, 'utf8');
+      }catch(e){}
+      var _server = http.createServer(function(req, res){
             var _data = null, _temp = [], _url = req.url;
-            if(proxyOptions.server.replay){
-              db.findOne({"key":new Buffer(_url).toString('base64')}, function(err, record){
-                if(record){
-                  res.headers = record.responseHeaders;
-                  res.write(record.responseData);
-                  res.end();
-                  return true;
-                }
-              });
-            }
-            if(req.method === 'POST'){
-              req.on('data', function(data){
-                _temp.push(data);
-              });
-              req.on('end', function(){
-                _data = querystring.parse(_temp.join(''));
-                self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
-                  self._insertOrUpdate(_url, responseStr, headers);
-                  res.headers = headers;
-                  res.write(responseStr);
-                  res.end();
-                });
-              });
-            }else if(req.method === 'GET'){
-              _data = url.parse(req.url);
-              self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
-                self._insertOrUpdate(_url, responseStr, headers);
-                res.headers = headers;
-                res.write(responseStr);
+            db.findOne({"key":new Buffer(_url).toString('base64')}, function(err, record){
+              if(proxyOptions.server.replay && record){
+                console.log(colors.yellow("Request %s through local db."), _url);
+                res.headers = record.responseHeaders;
+                res.write(record.responseData);
                 res.end();
-              });
-            }
+                return true;
+              }else{
+                console.log(colors.debug("Request %s proxy calling."), _url);
+                if(req.method === 'POST'){
+                  req.on('data', function(data){
+                    _temp.push(data);
+                  });
+                  req.on('end', function(){
+                    _data = querystring.parse(_temp.join(''));
+                    self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
+                      self._insertOrUpdate(_url, responseStr, headers);
+                      for(var key in headers){
+                        res.setHeader(key, headers[key]);
+                      }
+                      res.write(responseStr);
+                      res.end();
+                    });
+                  });
+                }else if(req.method === 'GET'){
+                  _data = url.parse(req.url);
+                  self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
+                    self._insertOrUpdate(_url, responseStr, headers);
+                    for(var key in headers){
+                      res.setHeader(key, headers[key]);
+                    }
+                    res.write(responseStr);
+                    res.end();
+                  });
+                }
+              }
+            });
       });
 
       console.log(colors.info("proxy server is running on %d..."), _port);
@@ -54,71 +65,62 @@ module.exports = {
   },
   performRequest : function(proxyType, options, endpoint, method, requestHeaders ,data, success) {
     var self = this,
-        dataString = JSON.stringify(data),
-        req = null,
-        headers = {};
+        dataString = JSON.stringify(data);
 
-    if (method == 'POST') {
-      headers = {
-        'Content-Type': 'text/html',
-        'Content-Length': dataString.length
-      };
-    }
     options.path = endpoint;
     options.method = method;
-    options.headers = headers;
+    options.headers = requestHeaders;
+    options.headers.host = options.host;
     if("HTTPS" === proxyType){
-      req = self._createHTTPSRequest(options, success);
+      self._createHTTPSRequest(options, dataString, success);
     }else{
-      req = self._createHTTPRequest(options, success);
+      self._createHTTPRequest(options, dataString, success);
     }
-    req.headers = requestHeaders;
-    if (method == 'POST') {
+  },
+  _createHTTPRequest : function(options, dataString, callback){
+    var req = http.request(options, function(res) {
+      res.setEncoding('utf-8');
+      var responseString = '';
+      res.on('data', function(data) {
+        responseString += data;
+      });
+      res.on('end', function() {
+        callback(responseString, res.headers);
+      });
+
+    });
+    if (options.method == 'POST') {
       req.write(dataString);
     }else{
       req.write('');
     }
     req.end();
   },
-  _createHTTPRequest : function(options, callback){
-    return http.request(options, function(res) {
-      res.setEncoding('utf-8');
-
-      var responseString = '';
-
-      res.on('data', function(data) {
-        responseString += data;
-      });
-
-      res.on('end', function() {
-        callback(responseString, res.headers);
-      });
-    });
-  },
-  _createHTTPSRequest : function(options, callback){
+  _createHTTPSRequest : function(options, dataString, callback){
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     options.agent = new https.Agent(options);
-    return https.request(options, function(res) {
+    var req = https.request(options, function(res) {
       res.setEncoding('utf-8');
-
       var responseString = '';
-
       res.on('data', function(data) {
         responseString += data;
       });
-
       res.on('end', function() {
         callback(responseString, res.headers);
       });
     });
+    if (options.method == 'POST') {
+      req.write(dataString);
+    }else{
+      req.write('');
+    }
+    req.end();
   },
   _insertOrUpdate:function(requestURL, responseStr, responseHeaders){
     var _key = new Buffer(requestURL).toString('base64');
-    db.findOne({"key": _key }, function (err, record) {
-      if(record){
-        db.update({"key": _key}, {"url": requestURL, "responseData":responseStr, "responseHeaders":responseHeaders}, {}, function (err, numReplaced) {});
-      }else{
-        db.insert({"key": _key, "url": requestURL, "responseData":responseStr, "responseHeaders":responseHeaders}, function (err, newDoc) {});
+    db.update({"key": _key}, {$set:{"url": requestURL, "responseData":responseStr, "responseHeaders":responseHeaders}},{upsert:true}, function(err, newReq){
+      if(err){
+        console.log(colors.error("store request error %s!"), requestURL);
       }
     });
   }
