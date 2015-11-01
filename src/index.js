@@ -50,14 +50,15 @@ function main(argv){
   }else if(argv._.indexOf(_commander[1]) > -1){
     //http-server
     var _port = argv.port,
-        _extions = argv.extions;
+        _extions = argv.extions,
+        _cwd = process.cwd();
     if(argv._.length === 3){
       _port = argv._[2];
     }
     if(argv.https){
-      HTTPServer.startHTTPS(argv._[1], parseInt(_port), _extions);
+      HTTPServer.startHTTPS(argv._[1], parseInt(_port), _cwd+'/'+_extions);
     }else{
-      HTTPServer.startHTTP(argv._[1], parseInt(_port), _extions);
+      HTTPServer.startHTTP(argv._[1], parseInt(_port), _cwd+'/'+_extions);
     }
   }else if(argv._.indexOf(_commander[2]) > -1){
     //http-proxy
