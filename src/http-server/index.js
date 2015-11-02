@@ -34,6 +34,9 @@ module.exports = {
   },
   _mountExtions:function(app, extions){
     try{
+      if(extions.length===0){
+        return true;
+      }
       var _ext = require(extions);
       for(var api in _ext){
         if(_ext[api].type === "post"){
