@@ -15,18 +15,21 @@ var HTTPServer = require("../../src/http-server/");
 
 describe('main', function() {
   it('give "watch-cp" then WatchCP should be called.', function(){
-    var spy = sinon.spy(WatchCP, 'monitor');
+    sinon.stub(WatchCP, 'monitor', function(){});
     main({'_':['watch-cp', 'source', 'destination']});
-    spy.should.have.been.calledWith('source', 'destination');
+    sinon.assert.calledOnce(WatchCP.monitor);
+    WatchCP.monitor.restore();
   });
   it('give "http-server" then HTTPServer.startHTTP should be called', function(){
-    var spy = sinon.spy(HTTPServer, 'startHTTP');
+    sinon.stub(HTTPServer, 'startHTTP', function(){});
     main({'_':['http-server', './', 2323], extions:''});
-    spy.should.have.been.calledWith('./', 2323, '');
+    sinon.assert.calledOnce(HTTPServer.startHTTP);
+    HTTPServer.startHTTP.restore();
   });
   it('give "http-server" and "https=true" then HTTPServer.startHTTPS should be called', function(){
-    var spy = sinon.spy(HTTPServer, 'startHTTPS');
+    sinon.stub(HTTPServer, 'startHTTPS', function(){});
     main({'_':['http-server', './', 2323], https:true, extions:''});
-    spy.should.have.been.calledWith('./', 2323, '');
+    sinon.assert.calledOnce(HTTPServer.startHTTPS);
+    HTTPServer.startHTTPS.restore();
   });
 });

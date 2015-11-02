@@ -13,16 +13,18 @@ var WatchCP = require("../../src/watch-cp/");
 describe('WatchCP', function() {
   describe('monitor()', function () {
     it('fs.watch should be called', function () {
-      var spy = sinon.spy(fs, 'watch');
+      sinon.stub(fs, 'watch', function(){});
       WatchCP.monitor('./', './testDEST');
-      spy.should.have.been.called;
+      sinon.assert.calledOnce(fs.watch);
+      fs.watch.restore();
     });
   });
   describe('_copy()', function(){
     it('fs.copy should be called', function(){
-      var spy = sinon.spy(fs, 'copy');
+      sinon.stub(fs, 'copy', function(){});
       WatchCP._copy('./source', './destination');
-      spy.should.have.been.called;
+      sinon.assert.calledOnce(fs.copy);
+      fs.copy.restore();
     });
   });
 });
