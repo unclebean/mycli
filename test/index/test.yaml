@@ -1,0 +1,11 @@
+---
+  server:
+    port: 8888
+    proxyType: "HTTP"             # if want to proxy HTTPS please change to HTTPS
+    replay: true
+  target:
+    host: "query.yahooapis.com"
+    port: 80
+    #key: "./privateKey.pem"      # follow nodejs api doc to provide key for HTTPS
+    #cert: "./certificate.pem"    # follow nodejs api doc to provide cert for HTTPS
+    #passphrase: "password"       # a string of passphrase for the private key

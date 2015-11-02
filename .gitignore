@@ -41,6 +41,9 @@ Thumbs.db
 # db
 #####################
 db/
+proxyDB
+proxyDB~
+proxyDB~~
 
 # npm package
 #####################

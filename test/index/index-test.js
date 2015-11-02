@@ -12,6 +12,7 @@ var fs = require('fs-extra');
 var main = require("../../src/index.js");
 var WatchCP = require("../../src/watch-cp/");
 var HTTPServer = require("../../src/http-server/");
+var HTTPProxy = require("../../src/http-proxy/");
 
 describe('main', function() {
   it('give "watch-cp" then WatchCP should be called.', function(){
@@ -31,5 +32,11 @@ describe('main', function() {
     main({'_':['http-server', './', 2323], https:true, extions:''});
     sinon.assert.calledOnce(HTTPServer.startHTTPS);
     HTTPServer.startHTTPS.restore();
+  });
+  it('give "http-proxy" then HTTPProxy.startup should be called', function(){
+    sinon.stub(HTTPProxy, 'startup', function(){});
+    main({'_':['http-proxy', './test/index/test.yaml']});
+    sinon.assert.calledOnce(HTTPProxy.startup);
+    HTTPProxy.startup.restore();
   });
 });
