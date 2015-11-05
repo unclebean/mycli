@@ -19,4 +19,12 @@ describe('HTTPServer', function(){
     sinon.assert.calledOnce(http.createServer);
     http.createServer.restore();
   });
+  it('should create https server', function(){
+    sinon.stub(https, 'createServer', function(){
+      return {'listen':function(){}};
+    });
+    HTTPServer.startHTTPS('./', 2323, '');
+    sinon.assert.calledOnce(https.createServer);
+    https.createServer.restore();
+  });
 });
