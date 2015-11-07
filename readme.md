@@ -31,6 +31,8 @@
 
 	mycli http-proxy <configuration file path>
 ------------------------------------------------------
+	We can through "http://127.0.0.1:[8888]/proxyDB" to manage proxy cache data.
+------------------------------------------------------
 	please follow below structure to provide your yaml file:
 
   		---

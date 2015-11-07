@@ -27,16 +27,30 @@ describe('HTTPProxy', function(){
     };
     db = new Datastore({ filename: './proxyDB' });
     db.loadDatabase(function (err) {});
-
   });
-  it('should create http server', function(){
-    sinon.stub(http, 'createServer', function(){
-      return {'listen':function(){}};
+  describe('startup', function(){
+    before(function(){
+      sinon.stub(http, 'createServer', function(callback){
+        callback({'url':'/'}, {'headers':'', write:function(){}, end:function(){}});
+        return {'listen':function(){}};
+      });
     });
-    HTTPProxy.startup(_options);
-    sinon.assert.calledOnce(http.createServer);
-    http.createServer.restore();
+    after(function(){
+      http.createServer.restore();
+    });
+    it('should create http server', function(){
+      HTTPProxy.startup(_options);
+      sinon.assert.calledOnce(http.createServer);
+    });
+    it('record exist and replay then should call response.write', function(){
+      sinon.stub(db, 'findOne', function(query, callback){
+        callback(null, {});
+      });
+      HTTPProxy.startup(_options);
+      db.findOne.restore();
+    });
   });
+
   it('should call db.update', function(){
     var spy = sinon.spy(db, 'update');
     HTTPProxy._insertOrUpdate("/mock", "{'test':'mock'}", {});

@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Proxy DB</title>
+    <meta charset="utf-8" />
+    <script src="http://twitter.github.com/hogan.js/builds/3.0.1/hogan-3.0.1.js"></script>
+    <script type="text/javascript">
+        var _listTemplate = '<form action="/proxyDB/update" method="POST">'+
+                              '<div class="record">'+
+                                '<h3>{{url}}</h3>'+
+                                '<button style="float:right;margin-bottom:8px;">save</button>'+
+                                '<input type="button" value="delete" style="float:right;margin-bottom:8px;" onclick="deleteRecord(\'{{_id}}\')"></input>'+
+                                '<div><textarea name="responseHeaders" style="width:100%;height:80px">{{responseHeaders}}</textarea></div>'+
+                                '<div><textarea name="responseData" style="width:100%;height:300px">{{responseData}}</textarea></div>'+
+                              '</div>'+
+                              '<input type="hidden" value="{{_id}}" name="_id"/>'+
+                             '</form>';
+        window.onload = function(){
+          var r = new XMLHttpRequest();
+          r.open("GET", "/proxyDB/all", true);
+          r.onreadystatechange = function () {
+            if (r.readyState != 4 || r.status != 200) return;
+            console.log("request success!");
+            var _data = JSON.parse(r.responseText);
+            var template = Hogan.compile(_listTemplate);
+            var _html = _data.map(function(record){
+              try{
+                record.responseHeaders = JSON.stringify(record.responseHeaders);
+              }catch(e){}
+              return template.render(record);
+            });
+            document.body.innerHTML = _html.join(" ");
+          };
+          r.send("");
+        }
+        function deleteRecord(recordId){
+          var _request = new XMLHttpRequest();
+          _request.open("GET", "/proxyDB/delete?id="+recordId, true);
+          _request.onreadystatechange = function(){
+            location.href = '/proxyDB';
+          };
+          _request.send("");
+        }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

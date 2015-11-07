@@ -21,21 +21,61 @@ module.exports = {
       }catch(e){}
       var _server = http.createServer(function(req, res){
             var _data = null, _temp = [], _url = req.url;
-            db.findOne({"key":new Buffer(_url).toString('base64')}, function(err, record){
-              if(proxyOptions.server.replay && record){
-                console.log(colors.yellow("Request %s through local db."), _url);
-                res.headers = record.responseHeaders;
-                res.write(record.responseData);
+            if('/proxyDB' === _url){
+              res.writeHeader(200, {"Content-Type": "text/html"});
+              res.write(fs.readFileSync(__dirname+"/index.html", "utf8"));
+              res.end();
+            }else if('/proxyDB/all' === _url){
+              db.find({}, function (err, records) {
+                res.writeHeader(200, {"Content-Type": "text/json"});
+                res.write(JSON.stringify(records));
                 res.end();
-                return true;
-              }else{
-                console.log(colors.debug("Request %s proxy calling."), _url);
-                if(req.method === 'POST'){
-                  req.on('data', function(data){
-                    _temp.push(data);
-                  });
-                  req.on('end', function(){
-                    _data = querystring.parse(_temp.join(''));
+              });
+            }else if('/proxyDB/update' === _url){
+              req.on('data', function(data){_temp.push(data);});
+              req.on('end', function(){
+                var _data = querystring.parse(_temp.join('')),
+                    _responseHeaders = _data.responseHeaders;
+                try{_responseHeaders=JSON.parse(_responseHeaders)}catch(e){}
+                db.update({_id:_data._id}, {'$set':{'responseData':_data.responseData, 'responseHeaders':_responseHeaders}}, function(err, newRecord){
+                  res.writeHeader(200, {"Content-Type": "text/json"});
+                  res.write(JSON.stringify({'status':'success'}));
+                  res.end();
+                });
+              });
+            }else if(_url.indexOf('/proxyDB/delete')>-1){
+              _data = url.parse(req.url, true);
+              db.remove({ _id: _data.query.id }, {}, function (err, numRemoved) {
+                res.writeHead(302, {'Location': '/proxyDB'});
+                res.end();
+              });
+            }else{
+              db.findOne({"key":new Buffer(_url).toString('base64')}, function(err, record){
+                if(proxyOptions.server.replay && record){
+                  console.log(colors.yellow("Request %s through local db."), _url);
+                  res.headers = record.responseHeaders;
+                  res.write(record.responseData);
+                  res.end();
+                  return true;
+                }else{
+                  console.log(colors.debug("Request %s proxy calling."), _url);
+                  if(req.method === 'POST'){
+                    req.on('data', function(data){
+                      _temp.push(data);
+                    });
+                    req.on('end', function(){
+                      _data = querystring.parse(_temp.join(''));
+                      self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
+                        self._insertOrUpdate(_url, responseStr, headers);
+                        for(var key in headers){
+                          res.setHeader(key, headers[key]);
+                        }
+                        res.write(responseStr);
+                        res.end();
+                      });
+                    });
+                  }else if(req.method === 'GET'){
+                    _data = url.parse(req.url);
                     self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
                       self._insertOrUpdate(_url, responseStr, headers);
                       for(var key in headers){
@@ -44,20 +84,10 @@ module.exports = {
                       res.write(responseStr);
                       res.end();
                     });
-                  });
-                }else if(req.method === 'GET'){
-                  _data = url.parse(req.url);
-                  self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function(responseStr, headers){
-                    self._insertOrUpdate(_url, responseStr, headers);
-                    for(var key in headers){
-                      res.setHeader(key, headers[key]);
-                    }
-                    res.write(responseStr);
-                    res.end();
-                  });
+                  }
                 }
-              }
-            });
+              });
+            }
       });
 
       console.log(colors.info("proxy server is running on %d..."), _port);
