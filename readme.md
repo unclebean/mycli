@@ -47,6 +47,11 @@
     			#cert: "./certificate.pem"    # follow nodejs api doc to provide cert for HTTPS
     			#passphrase: "password"       # a string of passphrase for the private key
 
+Release description
+--------------------------------
+1.2.1 - add proxy datatbase manage page - http://127.0.0.1:[port]/proxyDB
+
+
 [npm-image]: https://img.shields.io/npm/v/mycli.svg
 [npm-url]: https://npmjs.org/package/mycli
 [downloads-image]: https://img.shields.io/npm/dm/mycli.svg
