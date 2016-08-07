@@ -15,6 +15,29 @@
 
 	mycli http-server <path> <port> [--https=true] [-e extionsService.js]
 ---------------------------------------------------------
+##### Extions definition:
+| Type     | Description | 
+|----------|:-----------:|
+| proxy    |  1.3.0 new feature, integrate [http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware)  | 
+| get      |  handle GET request in extion for special api or mock api  |
+| post     |  handle POST request in extion for special api or mock api |
+
+---------------------------------------------------------
+##### Extions e.g: 
+```
+   // For proxy api extion:
+	var ext = {
+	    "/crservices":{
+	        proxyURL:'http://staging.cross-v.me',
+	        changeOrigin: true,
+	        type:"proxy"
+	    }
+	};
+	
+	module.exports = ext;
+```
+```
+   // For GET request extion:
 	var ext = {
   		"/test/:name":{
     		fn:function(request, response){
@@ -25,6 +48,7 @@
 	};
 
 	module.exports = ext;
+```
 
 ## HTTP Proxy(for now doesn't support https)
 [js-yaml](https://github.com/nodeca/js-yaml), [nedb](https://github.com/louischatriot/nedb) using yaml to provide proxy configuration and using nedb to record all response data.
@@ -49,6 +73,8 @@
 
 Release description
 --------------------------------
+1.3.0 - add proxy extions in http-server 
+
 1.2.1 - add proxy datatbase manage page - http://127.0.0.1:[port]/proxyDB
 
 

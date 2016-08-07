@@ -8,6 +8,7 @@ var privateKey  = fs.readFileSync(__dirname + '/key.pem', 'utf8');
 var certificate = fs.readFileSync(__dirname + '/cert.pem', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 var colors = require('../utils/');
+var proxy = require('http-proxy-middleware');
 
 module.exports = {
   startHTTP:function(path, port, extions){
@@ -41,6 +42,8 @@ module.exports = {
       for(var api in _ext){
         if(_ext[api].type === "post"){
           app.post(api, _ext[api].fn);
+        }else if(_ext[api].type === "proxy"){
+          app.use(api, proxy({target: _ext[api].proxyURL, changeOrigin: _ext[api].changeOrigin}));
         }else{
           app.get(api, _ext[api].fn);
         }
