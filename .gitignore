@@ -55,6 +55,7 @@ target/
 bin/
 .classpath
 .project
+.idea
 
 # coverage
 #####################
