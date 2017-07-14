@@ -69,7 +69,7 @@ module.exports = {
                     res.end();
                 });
             } else if (_url.indexOf('/dist/') > -1) {
-                var extname = path.extname(filePath);
+                var extname = path.extname(_url);
                 var contentType = 'text/html';
                 switch (extname) {
                     case '.js':
