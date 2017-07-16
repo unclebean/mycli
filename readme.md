@@ -73,6 +73,8 @@
 
 Release description
 --------------------------------
+1.3.1 - minor bug fix
+
 1.3.0 - add proxy extions in http-server 
 
 1.2.1 - add proxy datatbase manage page - http://127.0.0.1:[port]/proxyDB
