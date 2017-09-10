@@ -55,8 +55,10 @@ module.exports = {
                             'responseHeaders': _responseHeaders
                         }
                     }, function (err, newRecord) {
-                        res.writeHeader(200, {"Content-Type": "text/json"});
-                        res.write(JSON.stringify({'status': 'success'}));
+                        // res.writeHeader(200, {"Content-Type": "text/json"});
+                        // res.write(JSON.stringify({'status': 'success'}));
+                        // res.end();
+                        res.writeHead(302, {'Location': '/proxyDB'});
                         res.end();
                     });
                 });
