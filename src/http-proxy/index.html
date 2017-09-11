@@ -3,33 +3,71 @@
   <head>
     <title>Proxy DB</title>
     <meta charset="utf-8" />
+    <style>
+      ul{
+        list-style: none;
+      }
+      h3{
+        display: inline-block;
+        margin-right: 20px;
+      }
+      .button-unit{
+        margin: 10px 0px;
+      }
+      .serviceUrl{
+        font-weight: 700;
+        word-wrap: break-word;
+        word-break: break-all;
+        margin-bottom: 0px;
+      }
+      .record{
+        width: 95%;
+        word-wrap: break-word;
+      }
+      .responseHeaders{
+        width: 100%;
+        height: 80px;
+      }
+      .responseData{
+        width: 100%;
+        height: 200px;
+      }
+      .pagination li{
+        display: inline-block;
+        padding: 5px;
+        cursor: pointer;
+      }
+    </style>
     <script src="/dist/js/hogan-3.0.1.js"></script>
     <script type="text/javascript">
-        var _listTemplate = '<form action="/proxyDB/update" method="POST">'+
+        var PAGE_SIZE = 5;
+        var serviceList = null;
+        var _listTemplate = '<li><form action="/proxyDB/update" method="POST">'+
                               '<div class="record">'+
-                                '<h3>{{url}}</h3>'+
-                                '<button style="float:right;margin-bottom:8px;">save</button>'+
-                                '<input type="button" value="delete" style="float:right;margin-bottom:8px;" onclick="deleteRecord(\'{{_id}}\')"></input>'+
-                                '<div><textarea name="responseHeaders" style="width:100%;height:80px">{{responseHeaders}}</textarea></div>'+
-                                '<div><textarea name="responseData" style="width:100%;height:300px">{{responseData}}</textarea></div>'+
+                                '<h3 class="serviceUrl">{{url}}</h3>'+
+                                '<div class="button-unit"><button>save</button>'+
+                                '<input type="button" value="delete" onclick="deleteRecord(\'{{_id}}\')"></input></div>'+
+                                '<div><textarea name="responseHeaders" class="responseHeaders">{{responseHeaders}}</textarea></div>'+
+                                '<div><textarea name="responseData" class="responseData">{{responseData}}</textarea></div>'+
                               '</div>'+
                               '<input type="hidden" value="{{_id}}" name="_id"/>'+
-                             '</form>';
+                             '</form></div>';
+        var paginationTemplate = '<li onclick="goTo(\'{{index}}\')">{{index}}</li>';
         window.onload = function(){
           var r = new XMLHttpRequest();
           r.open("GET", "/proxyDB/all", true);
           r.onreadystatechange = function () {
             if (r.readyState != 4 || r.status != 200) return;
             console.log("request success!");
-            var _data = JSON.parse(r.responseText);
-            var template = Hogan.compile(_listTemplate);
-            var _html = _data.map(function(record){
+            serviceList = JSON.parse(r.responseText) || [];
+            serviceList = serviceList.map(function(record){
               try{
                 record.responseHeaders = JSON.stringify(record.responseHeaders);
               }catch(e){}
-              return template.render(record);
+              return record;
             });
-            document.body.innerHTML = _html.join(" ");
+            goTo(1);
+            renderPagination(serviceList.length);
           };
           r.send("");
         }
@@ -41,8 +79,52 @@
           };
           _request.send("");
         }
+        function goTo(pageNumber){
+          pageNumber = parseInt(pageNumber);
+          var start = (pageNumber-1)*PAGE_SIZE,
+              end = start + PAGE_SIZE;
+          renderServiceList(serviceList.slice(start, end));
+        }
+        function search(){
+          var keyword = document.querySelector('.search').value;
+          if(null !== keyword && keyword.length > 0){
+            var results = serviceList.filter(function(record){
+              if(record.url.toLowerCase().indexOf(keyword.toLowerCase()) != -1){
+                return record;
+              }
+            });
+            renderServiceList(results);
+          }else{
+            goTo(1);
+          }
+        }
+        function renderServiceList(renderList){
+          var template = Hogan.compile(_listTemplate);
+          var _html = renderList.map(function(record){
+            return template.render(record);
+          });
+          document.querySelector('.services-list').innerHTML = _html.join(" ");
+        }
+        function renderPagination(listSize){
+          var pages = [];
+          var template = Hogan.compile(paginationTemplate);
+          for(var i=0, len=listSize/PAGE_SIZE; i<len; i++){
+            pages.push(template.render({'index':i+1}));
+          }
+          document.querySelector('.pagination').innerHTML = pages.join(" ");
+        }
     </script>
   </head>
   <body>
+    <div id="services">
+      <ul>
+        <li>
+          <span>Search: </span>
+          <input class="search" placeholder="Search" oninput="search()"/>
+        </li>
+      </ul>
+      <ul class="pagination"></ul>
+      <ul class="services-list"></ul>
+    </div>
   </body>
 </html>

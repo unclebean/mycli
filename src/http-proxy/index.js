@@ -55,9 +55,6 @@ module.exports = {
                             'responseHeaders': _responseHeaders
                         }
                     }, function (err, newRecord) {
-                        // res.writeHeader(200, {"Content-Type": "text/json"});
-                        // res.write(JSON.stringify({'status': 'success'}));
-                        // res.end();
                         res.writeHead(302, {'Location': '/proxyDB'});
                         res.end();
                     });
@@ -91,6 +88,7 @@ module.exports = {
                     if (proxyOptions.server.replay && record) {
                         console.log(colors.yellow("Request %s through local db."), _url);
                         res.headers = record.responseHeaders;
+                        res.statusCode = record.responseHeaders.statusCode || 200;
                         res.write(record.responseData);
                         res.end();
                         return true;
@@ -103,10 +101,11 @@ module.exports = {
                             req.on('end', function () {
                                 _data = JSON.parse(_temp.toString());
                                 self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function (responseStr, headers) {
-                                    self._insertOrUpdate(_url, responseStr, headers);
+                                    self._insertOrUpdate(_url, responseStr, headers, _data);
                                     for (var key in headers) {
                                         res.setHeader(key, headers[key]);
                                     }
+                                    res.statusCode = headers.statusCode || 200;
                                     res.write(responseStr);
                                     res.end();
                                 });
@@ -118,6 +117,7 @@ module.exports = {
                                 for (var key in headers) {
                                     res.setHeader(key, headers[key]);
                                 }
+                                res.statusCode = headers.statusCode || 200;
                                 res.write(responseStr);
                                 res.end();
                             });
@@ -152,6 +152,7 @@ module.exports = {
                 responseString += data;
             });
             res.on('end', function () {
+                res.headers.statusCode = res.statusCode;
                 callback(responseString, res.headers);
             });
 
@@ -173,6 +174,7 @@ module.exports = {
                 responseString += data;
             });
             res.on('end', function () {
+                res.headers.statusCode = res.statusCode;
                 callback(responseString, res.headers);
             });
         });
@@ -183,7 +185,8 @@ module.exports = {
         }
         req.end();
     },
-    _insertOrUpdate: function (requestURL, responseStr, responseHeaders) {
+    _insertOrUpdate: function (requestURL, responseStr, responseHeaders, postData) {
+        postData = postData || '';
         var _key = new Buffer(requestURL).toString('base64');
         db.update({
             "key": _key
@@ -191,7 +194,8 @@ module.exports = {
             $set: {
                 "url": requestURL,
                 "responseData": responseStr,
-                "responseHeaders": responseHeaders
+                "responseHeaders": responseHeaders,
+                "postData": postData
             }
         }, {
             upsert: true
