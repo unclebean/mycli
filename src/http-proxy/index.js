@@ -82,38 +82,23 @@ module.exports = {
                 res.write(fs.readFileSync(__dirname + _url, "utf8"));
                 res.end();
             } else {
-                db.findOne({
-                    "key": new Buffer(_url).toString('base64')
-                }, function (err, record) {
-                    if (proxyOptions.server.replay && record) {
-                        console.log(colors.yellow("Request %s through local db."), _url);
-                        res.headers = record.responseHeaders;
-                        res.statusCode = record.responseHeaders.statusCode || 200;
-                        res.write(record.responseData);
-                        res.end();
-                        return true;
-                    } else {
-                        console.log(colors.debug("Request %s proxy calling."), _url);
-                        if (req.method === 'POST') {
-                            req.on('data', function (data) {
-                                _temp = data;
-                            });
-                            req.on('end', function () {
-                                _data = JSON.parse(_temp.toString());
-                                self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function (responseStr, headers) {
-                                    self._insertOrUpdate(_url, responseStr, headers, _data);
-                                    for (var key in headers) {
-                                        res.setHeader(key, headers[key]);
-                                    }
-                                    res.statusCode = headers.statusCode || 200;
-                                    res.write(responseStr);
-                                    res.end();
-                                });
-                            });
-                        } else if (req.method === 'GET') {
-                            _data = url.parse(req.url);
-                            self.performRequest(_proxyType, _options, _url, req.method, req.headers, _data, function (responseStr, headers) {
-                                self._insertOrUpdate(_url, responseStr, headers);
+                function updateDB(payloadBuffer){
+                    db.findOne({
+                        "key": new Buffer(_url).toString('base64'),
+                        "payloadKey": payloadBuffer.toString('base64')
+                    }, function (err, record) {
+                        console.log(record);
+                        if (proxyOptions.server.replay && record) {
+                            console.log(colors.yellow("Request %s through local db."), _url);
+                            res.headers = record.responseHeaders;
+                            res.statusCode = record.responseHeaders.statusCode || 200;
+                            res.write(record.responseData);
+                            res.end();
+                            return true;
+                        } else {
+                            console.log(colors.debug("Request %s proxy calling."), _url);
+                            self.performRequest(_proxyType, _options, _url, req.method, req.headers, payloadBuffer.toString(), function (responseStr, headers) {
+                                self._insertOrUpdate(_url, responseStr, headers, payloadBuffer.toString());
                                 for (var key in headers) {
                                     res.setHeader(key, headers[key]);
                                 }
@@ -121,9 +106,22 @@ module.exports = {
                                 res.write(responseStr);
                                 res.end();
                             });
+
                         }
-                    }
-                });
+                    }); 
+                }
+                if (req.method === 'POST') {
+                    req.on('data', function (data) {
+                        _temp = data;
+                    });
+                    req.on('end', function () {
+                        updateDB(_temp);
+                    });
+                } else if (req.method === 'GET') {
+                    var data = url.parse(req.url);
+                    updateDB(new Buffer(data));
+                }
+                
             }
         });
 
@@ -132,7 +130,7 @@ module.exports = {
     },
     performRequest: function (proxyType, options, endpoint, method, requestHeaders, data, success) {
         var self = this,
-            dataString = JSON.stringify(data);
+            dataString = data;//JSON.stringify(data);
 
         options.path = endpoint;
         options.method = method;
@@ -185,8 +183,8 @@ module.exports = {
         }
         req.end();
     },
-    _insertOrUpdate: function (requestURL, responseStr, responseHeaders, postData) {
-        postData = postData || '';
+    _insertOrUpdate: function (requestURL, responseStr, responseHeaders, payloadData) {
+        payloadData = payloadData || '';
         var _key = new Buffer(requestURL).toString('base64');
         db.update({
             "key": _key
@@ -195,7 +193,8 @@ module.exports = {
                 "url": requestURL,
                 "responseData": responseStr,
                 "responseHeaders": responseHeaders,
-                "postData": postData
+                "payloadData": payloadData,
+                "payloadKey": new Buffer(payloadData).toString('base64')
             }
         }, {
             upsert: true
