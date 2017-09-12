@@ -12,6 +12,7 @@ var Datastore = require('nedb'),
 db.loadDatabase(function (err) {
 });
 var colors = require('../utils/');
+var httpClient = require('./httpClient');
 
 module.exports = {
     startup: function (proxyOptions) {
@@ -112,7 +113,7 @@ module.exports = {
                             return true;
                         } else {
                             console.log(colors.debug("Request %s proxy calling."), _url);
-                            self.performRequest(_proxyType, _options, _url, req.method, req.headers, payloadBuffer.toString(), function (responseStr, headers) {
+                            httpClient.performRequest(_proxyType, _options, _url, req.method, req.headers, payloadBuffer.toString(), function (responseStr, headers) {
                                 if(isCacheEnabledURL){
                                     self._insertOrUpdate(_url, responseStr, headers, payloadBuffer.toString());
                                 }
@@ -144,61 +145,6 @@ module.exports = {
 
         console.log(colors.info("proxy server is running on %d..."), _port);
         _server.listen(_port);
-    },
-    performRequest: function (proxyType, options, endpoint, method, requestHeaders, data, success) {
-        var self = this,
-            dataString = data;//JSON.stringify(data);
-
-        options.path = endpoint;
-        options.method = method;
-        options.headers = requestHeaders;
-        options.headers.host = options.host;
-        if ("HTTPS" === proxyType) {
-            self._createHTTPSRequest(options, dataString, success);
-        } else {
-            self._createHTTPRequest(options, dataString, success);
-        }
-    },
-    _createHTTPRequest: function (options, dataString, callback) {
-        var req = http.request(options, function (res) {
-            res.setEncoding('utf-8');
-            var responseString = '';
-            res.on('data', function (data) {
-                responseString += data;
-            });
-            res.on('end', function () {
-                res.headers.statusCode = res.statusCode;
-                callback(responseString, res.headers);
-            });
-
-        });
-        if (options.method == 'POST') {
-            req.write(dataString);
-        } else {
-            req.write('');
-        }
-        req.end();
-    },
-    _createHTTPSRequest: function (options, dataString, callback) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-        options.agent = new https.Agent(options);
-        var req = https.request(options, function (res) {
-            res.setEncoding('utf-8');
-            var responseString = '';
-            res.on('data', function (data) {
-                responseString += data;
-            });
-            res.on('end', function () {
-                res.headers.statusCode = res.statusCode;
-                callback(responseString, res.headers);
-            });
-        });
-        if (options.method == 'POST') {
-            req.write(dataString);
-        } else {
-            req.write('');
-        }
-        req.end();
     },
     _insertOrUpdate: function (requestURL, responseStr, responseHeaders, payloadData) {
         payloadData = payloadData || '';
