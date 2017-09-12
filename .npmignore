@@ -1,3 +1,6 @@
 coverage/
 test/
 .travis.yml
+.idea/
+cross-v.yml
+proxyDB

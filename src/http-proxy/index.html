@@ -4,6 +4,9 @@
     <title>Proxy DB</title>
     <meta charset="utf-8" />
     <style>
+      body{
+        margin: 0px;
+      }
       ul{
         list-style: none;
       }
@@ -24,6 +27,10 @@
         width: 95%;
         word-wrap: break-word;
       }
+      .payloadData{
+        width: 100%;
+        height: 50px;
+      }
       .responseHeaders{
         width: 100%;
         height: 80px;
@@ -37,6 +44,21 @@
         padding: 5px;
         cursor: pointer;
       }
+      .header-bar{
+        width: 93%;
+      }
+      .create-new-btn{
+        float: right;
+      }
+      .create-new{
+        justify-content: center;
+        display: none;
+        box-shadow: 0 6px 4px -2px grey;
+      }
+      .create-new-form{
+        padding: 20px;
+        width: 60%;
+      }
     </style>
     <script src="/dist/js/hogan-3.0.1.js"></script>
     <script type="text/javascript">
@@ -47,8 +69,9 @@
                                 '<h3 class="serviceUrl">{{url}}</h3>'+
                                 '<div class="button-unit"><button>save</button>'+
                                 '<input type="button" value="delete" onclick="deleteRecord(\'{{_id}}\')"></input></div>'+
-                                '<div><textarea name="responseHeaders" class="responseHeaders">{{responseHeaders}}</textarea></div>'+
-                                '<div><textarea name="responseData" class="responseData">{{responseData}}</textarea></div>'+
+                                '{{#payloadData}}<div><div>Payload Data</div><textarea name="payloadData" class="payloadData">{{payloadData}}</textarea></div>{{/payloadData}}'+
+                                '<div><div>Response Header</div><textarea name="responseHeaders" class="responseHeaders">{{responseHeaders}}</textarea></div>'+
+                                '<div><div>Response Data</div><textarea name="responseData" class="responseData">{{responseData}}</textarea></div>'+
                               '</div>'+
                               '<input type="hidden" value="{{_id}}" name="_id"/>'+
                              '</form></div>';
@@ -87,7 +110,7 @@
         }
         function search(){
           var keyword = document.querySelector('.search').value;
-          if(null !== keyword && keyword.length > 0){
+          if(null !== keyword && keyword.length > 3){
             var results = serviceList.filter(function(record){
               if(record.url.toLowerCase().indexOf(keyword.toLowerCase()) != -1){
                 return record;
@@ -113,14 +136,60 @@
           }
           document.querySelector('.pagination').innerHTML = pages.join(" ");
         }
+        function showCreateNewAPIForm(){
+          document.querySelector('.create-new').style.display = 'flex';
+        }
+        function hideCreateNewAPIForm(){
+          document.querySelector('.create-new').style.display = 'none';
+        }
     </script>
   </head>
   <body>
     <div id="services">
-      <ul>
+      <div class="create-new">
+        <form class="create-new-form" action="/proxyDB/insert" method="POST">
+          <div>
+            <label>Service Name</label>
+          </div>
+          <div>
+            <input type="text" name="url"/>
+          </div>
+          <!--
+          <div>
+            <label>Request Type</label>
+          </div>
+          <div>
+            <input type="radio" name="requestType" value="GET" checked>GET</input>
+            <input type="radio" name="requestType" value="POST">POST</input>
+          </div>
+          -->
+          <div>
+            <label>Payload Data</label>
+          </div>
+          <div>
+            <textarea name="payloadData" class="payloadData"></textarea>
+          </div>
+          <div>
+            <label>Response Headers</label>
+          </div>
+          <div>
+            <textarea name="responseHeaders" class="responseHeaders">{"server":"nginx/1.10.3 (Ubuntu)","date":"Tue, 12 Sep 2017 13:51:46 GMT","transfer-encoding":"chunked","connection":"keep-alive","statusCode":200}</textarea>
+          </div>
+          <div>
+            <label>Response Data</label>
+          </div>
+          <div>
+            <textarea name="responseData" class="responseData"></textarea>
+          </div>
+          <button>Submmit</button>
+          <input type="button" value="Cancel" onclick="hideCreateNewAPIForm()" />
+        </form>
+      </div>
+      <ul class="header-bar">
         <li>
           <span>Search: </span>
           <input class="search" placeholder="Search" oninput="search()"/>
+          <button class="create-new-btn" onclick="showCreateNewAPIForm()">Create New API</button> 
         </li>
       </ul>
       <ul class="pagination"></ul>

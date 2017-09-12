@@ -17,7 +17,8 @@ module.exports = {
     startup: function (proxyOptions) {
         var self = this,
             _port = parseInt(proxyOptions.server.port) ? proxyOptions.server.port : 5555,
-            _options = proxyOptions.target;
+            _options = proxyOptions.target,
+            _whitelist = _options.whitelist || [];
         var _proxyType = proxyOptions.server.proxyType ? proxyOptions.server.proxyType : "HTTP";
         try {
             _options.key = fs.readFileSync(_options.key, 'utf8');
@@ -52,14 +53,28 @@ module.exports = {
                     db.update({_id: _data._id}, {
                         '$set': {
                             'responseData': _data.responseData,
-                            'responseHeaders': _responseHeaders
+                            'responseHeaders': _responseHeaders,
+                            'payloadData': _data.payloadData
                         }
                     }, function (err, newRecord) {
                         res.writeHead(302, {'Location': '/proxyDB'});
                         res.end();
                     });
                 });
-            } else if (_url.indexOf('/proxyDB/delete') > -1) {
+            } else if('/proxyDB/insert' === _url){
+                req.on('data', function(data){_temp.push(data);});
+                req.on('end', function(){
+                    var _data = querystring.parse(_temp.join('')),
+                        _responseHeaders = _data.responseHeaders;
+                    try {
+                        _responseHeaders = JSON.parse(_responseHeaders)
+                    } catch (e) {
+                    }
+                    self._insertOrUpdate(_data.url, _data.responseData, _responseHeaders, _data.payloadData);
+                    res.writeHead(302, {'Location': '/proxyDB'});
+                    res.end();
+                });
+            }else if (_url.indexOf('/proxyDB/delete') > -1) {
                 _data = url.parse(req.url, true);
                 db.remove({
                     _id: _data.query.id
@@ -87,8 +102,8 @@ module.exports = {
                         "key": new Buffer(_url).toString('base64'),
                         "payloadKey": payloadBuffer.toString('base64')
                     }, function (err, record) {
-                        console.log(record);
-                        if (proxyOptions.server.replay && record) {
+                        var isCacheEnabledURL = _whitelist.indexOf(_url) === -1;
+                        if (proxyOptions.server.replay && record && isCacheEnabledURL) {
                             console.log(colors.yellow("Request %s through local db."), _url);
                             res.headers = record.responseHeaders;
                             res.statusCode = record.responseHeaders.statusCode || 200;
@@ -98,7 +113,9 @@ module.exports = {
                         } else {
                             console.log(colors.debug("Request %s proxy calling."), _url);
                             self.performRequest(_proxyType, _options, _url, req.method, req.headers, payloadBuffer.toString(), function (responseStr, headers) {
-                                self._insertOrUpdate(_url, responseStr, headers, payloadBuffer.toString());
+                                if(isCacheEnabledURL){
+                                    self._insertOrUpdate(_url, responseStr, headers, payloadBuffer.toString());
+                                }
                                 for (var key in headers) {
                                     res.setHeader(key, headers[key]);
                                 }
@@ -118,8 +135,8 @@ module.exports = {
                         updateDB(_temp);
                     });
                 } else if (req.method === 'GET') {
-                    var data = url.parse(req.url);
-                    updateDB(new Buffer(data));
+                    // var data = url.parse(req.url);
+                    updateDB(new Buffer(''));
                 }
                 
             }
