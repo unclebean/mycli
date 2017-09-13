@@ -73,6 +73,8 @@
 
 Release description
 --------------------------------
+1.4.0 - add proxy API whitelist feature
+
 1.3.1 - minor bug fix
 
 1.3.0 - add proxy extions in http-server 
