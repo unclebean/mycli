@@ -56,40 +56,4 @@ describe('HTTPProxy', function(){
     HTTPProxy._insertOrUpdate("/mock", "{'test':'mock'}", {});
     spy.called;
   });
-  describe('performRequest', function(){
-    it('give "HTTPS" should call _createHTTPSRequest', function(){
-      sinon.stub(HTTPProxy, '_createHTTPSRequest', function(){});
-      HTTPProxy.performRequest("HTTPS", {}, 'endpoint', 'GET', {}, {}, null);
-      sinon.assert.calledOnce(HTTPProxy._createHTTPSRequest);
-      HTTPProxy._createHTTPSRequest.restore();
-    });
-    it('give "HTTP" should call _createHTTPRequest', function(){
-      sinon.stub(HTTPProxy, '_createHTTPRequest', function(){});
-      HTTPProxy.performRequest("HTTP", {}, 'endpoint', 'GET', {}, {}, null);
-      sinon.assert.calledOnce(HTTPProxy._createHTTPRequest);
-      HTTPProxy._createHTTPRequest.restore();
-    });
-  });
-  it('should call http.request', function(){
-    sinon.stub(http, 'request', function(args, callback){
-      return {
-        'write':function(){},
-        'end':function(){}
-      };
-    });
-    HTTPProxy._createHTTPRequest({}, "", null);
-    sinon.assert.calledOnce(http.request);
-    http.request.restore();
-  });
-  it('should call https.request', function(){
-    sinon.stub(https, 'request', function(args, callback){
-      return {
-        'write':function(){},
-        'end':function(){}
-      };
-    });
-    HTTPProxy._createHTTPSRequest({}, "", null);
-    sinon.assert.calledOnce(https.request);
-    https.request.restore();
-  });
 });
