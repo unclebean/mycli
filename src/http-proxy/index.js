@@ -148,16 +148,18 @@ module.exports = {
     },
     _insertOrUpdate: function (requestURL, responseStr, responseHeaders, payloadData) {
         payloadData = payloadData || '';
-        var _key = new Buffer(requestURL).toString('base64');
+        var _key = new Buffer(requestURL).toString('base64'),
+            _payloadKey = new Buffer(payloadData).toString('base64');
         db.update({
-            "key": _key
+            "key": _key,
+            "payloadKey": _payloadKey
         }, {
             $set: {
                 "url": requestURL,
                 "responseData": responseStr,
                 "responseHeaders": responseHeaders,
                 "payloadData": payloadData,
-                "payloadKey": new Buffer(payloadData).toString('base64')
+                "payloadKey": _payloadKey
             }
         }, {
             upsert: true
