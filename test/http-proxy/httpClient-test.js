@@ -9,6 +9,7 @@ var expect = chai.expect,
 var http = require('http');
 var https = require('https');
 var httpClient = require("../../src/http-proxy/httpClient");
+var RequestModel = require("../../src/http-proxy/models/requestModel");
 var Datastore = require('nedb');
 
 describe('httpClient', function(){
@@ -21,13 +22,15 @@ describe('httpClient', function(){
   describe('performRequest', function(){
     it('give "HTTPS" should call _createHTTPSRequest', function(){
       sinon.stub(httpClient, '_createHTTPSRequest', function(){});
-      httpClient.performRequest("HTTPS", {}, 'endpoint', 'GET', {}, {}, null);
+      var requestModel = new RequestModel("HTTPS", {}, 'endpoint', 'GET', {}, {});
+      httpClient.performRequest(requestModel, null);
       sinon.assert.calledOnce(httpClient._createHTTPSRequest);
       httpClient._createHTTPSRequest.restore();
     });
     it('give "HTTP" should call _createHTTPRequest', function(){
       sinon.stub(httpClient, '_createHTTPRequest', function(){});
-      httpClient.performRequest("HTTP", {}, 'endpoint', 'GET', {}, {}, null);
+      var requestModel = new RequestModel("HTTP", {}, 'endpoint', 'GET', {}, {});
+      httpClient.performRequest(requestModel, null);
       sinon.assert.calledOnce(httpClient._createHTTPRequest);
       httpClient._createHTTPRequest.restore();
     });

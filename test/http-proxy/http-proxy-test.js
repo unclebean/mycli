@@ -42,18 +42,5 @@ describe('HTTPProxy', function(){
       HTTPProxy.startup(_options);
       sinon.assert.calledOnce(http.createServer);
     });
-    it('record exist and replay then should call response.write', function(){
-      sinon.stub(db, 'findOne', function(query, callback){
-        callback(null, {});
-      });
-      HTTPProxy.startup(_options);
-      db.findOne.restore();
-    });
-  });
-
-  it('should call db.update', function(){
-    var spy = sinon.spy(db, 'update');
-    HTTPProxy._insertOrUpdate("/mock", "{'test':'mock'}", {});
-    spy.called;
   });
 });

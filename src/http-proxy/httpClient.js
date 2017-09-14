@@ -1,19 +1,24 @@
 var https = require('https'),
     http = require('http');
+var RequestModel = require('./models/requestModel');
 
 module.exports = {
-    performRequest: function (proxyType, options, endpoint, method, requestHeaders, data, success) {
-        var self = this,
-            dataString = data;//JSON.stringify(data);
-
-        options.path = endpoint;
-        options.method = method;
-        options.headers = requestHeaders;
-        options.headers.host = options.host;
-        if ("HTTPS" === proxyType) {
-            self._createHTTPSRequest(options, dataString, success);
-        } else {
-            self._createHTTPRequest(options, dataString, success);
+    performRequest: function (requestModel, success) {
+        try{
+            var self = this,
+            dataString = requestModel.payloadData;//JSON.stringify(data);
+            var options = requestModel.targetHostConfig;
+            options.path = requestModel.url;
+            options.method = requestModel.requestType;
+            options.headers = requestModel.requestHeaders;
+            options.headers.host = requestModel.targetHostConfig.host;
+            if ("HTTPS" === requestModel.proxyType) {
+                self._createHTTPSRequest(options, dataString, success);
+            } else {
+                self._createHTTPRequest(options, dataString, success);
+            }
+        }catch(e){
+            console.log(e);
         }
     },
     _createHTTPRequest: function (options, dataString, callback) {
