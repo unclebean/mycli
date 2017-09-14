@@ -45,7 +45,7 @@ module.exports = {
     dispatch: function(request, response){
         var url = request.url;
         for(var requestPath in this.handler){
-            var regExp = new RegExp(requestPath, 'y');
+            var regExp = new RegExp(requestPath);
             if(regExp.exec(url)){
                 this.handler[requestPath](request, response);
                 break;
