@@ -34,8 +34,8 @@ module.exports = {
             });
 
         });
-        if (options.method == 'POST') {
-            req.write(dataString);
+        if (options.method !== 'GET') {
+            req.write(dataString || '');
         } else {
             req.write('');
         }
@@ -55,8 +55,8 @@ module.exports = {
                 callback(responseString, res.headers);
             });
         });
-        if (options.method == 'POST') {
-            req.write(dataString);
+        if (options.method !== 'GET') {
+            req.write(dataString || '');
         } else {
             req.write('');
         }

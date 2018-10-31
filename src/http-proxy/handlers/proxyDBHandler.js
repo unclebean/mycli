@@ -74,15 +74,15 @@ var proxyDBHandler = {
     },
     serviceCallOrReplay: function(request, response){
         var _data = null, _temp = [];
-        if (request.method === 'POST') {
+        if (request.method === 'GET') {
+            proxyDBHandler.tryToReplay(request, response);
+        } else {
             request.on('data', function (data) {
                 _temp = data;
             });
             request.on('end', function () {
                 proxyDBHandler.tryToReplay(request, response, _temp);
             });
-        } else if (request.method === 'GET') {
-            proxyDBHandler.tryToReplay(request, response);
         }
     },
     tryToReplay: function(request, response, payloadBuffer){
@@ -102,6 +102,7 @@ var proxyDBHandler = {
                 requestModel.setRequestType(request.method);
                 requestModel.setRequestHeaders(request.headers);
                 requestModel.setPayloadData(payloadBuffer.toString());
+                console.log(colors.verbose('Request %s proxy calling.'), url);
                 httpClient.performRequest(requestModel, function(responseStr, headers){
                     proxyDBHandler.recordResponse(url, payloadBuffer, response, responseStr, headers);
                 });
@@ -117,7 +118,7 @@ var proxyDBHandler = {
         response.end();
     },
     recordResponse: function(url, payloadBuffer, response, responseStr, headers){
-        if(proxyDBHandler.isCacheEnabledURL(url)){
+        if(proxyDBHandler.isCacheEnabledURL(url) && headers.statusCode === 200){
             var responseModel = new ResponseModel();
             responseModel.setUrl(url);
             responseModel.setResponseData(responseStr);

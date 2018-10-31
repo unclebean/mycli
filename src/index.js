@@ -37,6 +37,11 @@ process.on('SIGINT', function () {
   console.log(colors.warn('Got a sigint bye...'));
   process.exit(0);
 });
+
+process.on('uncaughtException', function (err) {
+  console.log(colors.error(err));
+});
+
 function main(argv){
   if(argv._.indexOf(_commander[0]) > -1){
     //watch-cp

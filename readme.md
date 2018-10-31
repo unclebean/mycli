@@ -50,7 +50,7 @@
 	module.exports = ext;
 ```
 
-## HTTP Proxy(for now doesn't support https)
+## HTTP Proxy
 [js-yaml](https://github.com/nodeca/js-yaml), [nedb](https://github.com/louischatriot/nedb) using yaml to provide proxy configuration and using nedb to record all response data.
 
 	mycli http-proxy <configuration file path>
@@ -73,6 +73,8 @@
 
 Release description
 --------------------------------
+1.4.1 - bug fix, (1)resolve http-proxy target server disconnect the proccess crash issue. (2)fixed recording error status response issue. (3) fixed PUT, DELETE issue.
+
 1.4.0 - add proxy API whitelist feature
 
 1.3.1 - minor bug fix

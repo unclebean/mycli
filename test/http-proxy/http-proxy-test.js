@@ -31,7 +31,7 @@ describe('HTTPProxy', function(){
   describe('startup', function(){
     before(function(){
       sinon.stub(http, 'createServer', function(callback){
-        callback({'url':'/'}, {'headers':'', write:function(){}, end:function(){}});
+        callback({'url':'/', 'on': () => {}}, {'headers':'', write:function(){}, end:function(){}});
         return {'listen':function(){}};
       });
     });

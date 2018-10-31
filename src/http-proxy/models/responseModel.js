@@ -30,7 +30,7 @@ ResponseModel.prototype = {
         }
     },
     setResponseData: function(responseData){
-        this.responseData = responseData;
+        this.responseData = responseData === 'null' ? '' : responseData;
     }
 
 };

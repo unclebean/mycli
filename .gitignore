@@ -61,3 +61,4 @@ bin/
 #####################
 .coveralls.yml
 coverage/
+cross-v.yml
