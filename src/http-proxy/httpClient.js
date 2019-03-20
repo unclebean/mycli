@@ -15,7 +15,7 @@ function gunzipRespHandler(response, callback) {
             if(error){
                 callback(error);
             } else {
-                callback(data.toString(), response.headers);
+                callback(data, response.headers);
             }
         });
     }).on("error", function(e) {
